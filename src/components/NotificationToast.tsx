@@ -5,8 +5,7 @@ interface NotificationToastProps {
   type: 'success' | 'error' | 'info';
   onClose: () => void;
 }
-
-const NotificationToast: React.FC<NotificationToastProps> = ({ message, type, onClose }) => {
+function NotificationToast({ message, type, onClose }: NotificationToastProps) {
   const getBackgroundColor = () => {
     switch (type) {
       case 'success': return '#d4edda';

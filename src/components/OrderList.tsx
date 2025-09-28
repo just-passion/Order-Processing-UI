@@ -7,8 +7,7 @@ interface OrderListProps {
   orders: Order[];
   onRefresh: () => void;
 }
-
-const OrderList: React.FC<OrderListProps> = ({ orders, onRefresh }) => {
+function OrderList({ orders, onRefresh }: OrderListProps) {
   const [updatingOrders, setUpdatingOrders] = useState<Set<string>>(new Set());
 
   const getStatusColor = (status: OrderStatus): string => {

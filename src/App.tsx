@@ -7,7 +7,7 @@ import { Order } from './types';
 import { api } from './services/api';
 import './App.css';
 
-const App: React.FC = () => {
+function App() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

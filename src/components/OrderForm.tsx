@@ -7,7 +7,7 @@ interface OrderFormProps {
   onOrderCreated: (order: Order) => void;
 }
 
-const OrderForm: React.FC<OrderFormProps> = ({ onOrderCreated }) => {
+function OrderForm({ onOrderCreated }: OrderFormProps) {
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
