@@ -1,35 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
+import OrderForm from './components/OrderForm';
+import OrderList from './components/OrderList';
+import { useWebSocket } from './hooks/useWebSocket';
+import { Order } from './types';
+import { api } from './services/api';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { isConnected } = useWebSocket({
+    onOrderUpdate: (orderEvent) => {
+      // Update the order in the list
+      setOrders(prevOrders => {
+        const existingIndex = prevOrders.findIndex(o => o.orderId === orderEvent.orderId);
+        if (existingIndex >= 0) {
+          const updatedOrders = [...prevOrders];
+          updatedOrders[existingIndex] = orderEvent.order;
+          return updatedOrders;
+        } else {
+          // New order, add to the beginning
+          return [orderEvent.order, ...prevOrders];
+        }
+      });
+    }
+  });
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const fetchedOrders = await api.getOrders();
+      setOrders(fetchedOrders);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch orders');
+      console.error('Error fetching orders:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleOrderCreated = (newOrder: Order) => {
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+        {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-
-export default App
+      
+      <header className="header">
+        <div className="container">
+          <h1>Order Processing System</h1>
+        </div>
+      </header>
+      
+      <main className="container">
+        <div className="main-content">
+          <div className="order-form-section">
+            <OrderForm onOrderCreated={handleOrderCreated} />
+          </div>
+          
+          <div className="order-list-section">
+            {loading ? (
+              <div className="loading">Loading orders...</div>
+            ) : error ? (
+              <div className="error">{error}</div>
+            ) : (
+              <OrderList 
+                orders={orders} 
+                onRefresh={fetchOrders}
+              />
+            )}
+          </div>
+        </div>
+      </main>
+      
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
+    </div>
+  );
+};
