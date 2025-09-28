@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Order, OrderItem, CreateOrderRequest } from '../types';
+import type { Order, OrderItem, CreateOrderRequest } from '../types';
 import { api } from '../services/api';
 
 interface OrderFormProps {

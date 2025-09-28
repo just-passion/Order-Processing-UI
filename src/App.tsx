@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import OrderForm from './components/OrderForm';
 import OrderList from './components/OrderList';
 import { useWebSocket } from './hooks/useWebSocket';
-import { Order } from './types';
+import type { Order } from './types';
 import { api } from './services/api';
 import './App.css';
 
@@ -97,3 +97,5 @@ function App() {
     </div>
   );
 };
+
+export default App;

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
-import { OrderEvent } from '../types';
+import { type OrderEvent } from '../types';
 
 interface UseWebSocketProps {
   onOrderUpdate?: (orderEvent: OrderEvent) => void;
@@ -12,8 +12,7 @@ export const useWebSocket = ({ onOrderUpdate }: UseWebSocketProps) => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
-    
+const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';    
     // Create socket connection
     socketRef.current = io(socketUrl, {
       transports: ['websocket'],
